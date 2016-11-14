@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace Waf.DotNetPad.Applications.Services
 {
     [Export(typeof(ISettingsProvider))]
-    internal class SettingsProvider : ISettingsProvider
+    public class SettingsProvider : ISettingsProvider
     {
         private static readonly Type[] knownTypes = new[] { typeof(string[]) };
 

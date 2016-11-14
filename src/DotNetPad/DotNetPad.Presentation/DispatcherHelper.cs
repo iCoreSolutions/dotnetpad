@@ -3,13 +3,13 @@ using System.Windows.Threading;
 
 namespace Waf.DotNetPad.Presentation
 {
-    internal static class DispatcherHelper
+    public static class DispatcherHelper
     {
         /// <summary>
         /// Execute the event queue of the dispatcher.
         /// </summary>
         [SecurityPermissionAttribute(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        internal static void DoEvents()
+        public static void DoEvents()
         {
             DispatcherFrame frame = new DispatcherFrame();
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,

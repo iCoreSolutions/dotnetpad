@@ -9,7 +9,7 @@ using Waf.DotNetPad.Applications.Views;
 namespace Waf.DotNetPad.Applications.Services
 {
     [Export(typeof(IShellService)), Export]
-    internal class ShellService : Model, IShellService
+    public class ShellService : Model, IShellService
     {
         private readonly Lazy<IShellView> shellView;
         private readonly List<Task> tasksToCompleteBeforeShutdown;

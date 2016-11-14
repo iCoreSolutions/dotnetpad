@@ -10,7 +10,7 @@ using Waf.DotNetPad.Domain;
 
 namespace Waf.DotNetPad.Applications.Controllers
 {
-    [Export(typeof(IModuleController))]
+   // [Export(typeof(IModuleController))]
     internal class ModuleController : IModuleController
     {
         private const string appSettingsFileName = "Settings.xml";
@@ -66,7 +66,8 @@ namespace Waf.DotNetPad.Applications.Controllers
 
         public void Run()
         {
-            fileController.Run();
+            fileController.Run(); 
+
 
             ShellViewModel.Show();
         }

@@ -12,7 +12,7 @@ using Waf.DotNetPad.Applications.Views;
 
 namespace Waf.DotNetPad.Applications.ViewModels
 {
-    [Export]
+    //[Export]
     public class ShellViewModel : ViewModel<IShellView>
     {
         private readonly AppSettings settings;
@@ -29,7 +29,7 @@ namespace Waf.DotNetPad.Applications.ViewModels
         private string statusText;
         
 
-        [ImportingConstructor]
+        //[ImportingConstructor]
         public ShellViewModel(IShellView view, IShellService shellService, IFileService fileService, ICSharpSampleService csharpSampleService, 
             IVisualBasicSampleService visualBasicSampleService)
             : base(view)

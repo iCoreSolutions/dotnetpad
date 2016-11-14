@@ -23,7 +23,7 @@ namespace Waf.DotNetPad.Applications.Controllers
     /// <summary>
     /// Responsible for the file related commands.
     /// </summary>
-    [Export]
+    //[Export]
     internal class FileController
     {
         private readonly IMessageService messageService;
