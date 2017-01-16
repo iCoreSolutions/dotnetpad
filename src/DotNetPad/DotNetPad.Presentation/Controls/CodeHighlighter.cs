@@ -61,7 +61,7 @@ namespace Waf.DotNetPad.Presentation.Controls
             cachedLines[lineNumber]?.Cancel();
             var newLine = new VersionedHighlightedLine(Document, documentLine, Document.Version, cachedLine);
             cachedLines[lineNumber] = newLine;
-            UpdateHighlightLineAsync(newLine);
+            UpdateHighlightLineAsync(newLine, cachedLine);
 
             foreach (var line in cachedLines.ToArray().Reverse())
             {
@@ -75,7 +75,7 @@ namespace Waf.DotNetPad.Presentation.Controls
             return newLine;
         }
 
-        private async void UpdateHighlightLineAsync(VersionedHighlightedLine line)
+        private async void UpdateHighlightLineAsync(VersionedHighlightedLine line, VersionedHighlightedLine oldHighlightedLine)
         {
             try
             {
@@ -114,11 +114,31 @@ namespace Waf.DotNetPad.Presentation.Controls
                                 Length = classifiedSpan.TextSpan.Length
                             });
                         }
-                        HighlightingStateChanged?.Invoke(documentLine.LineNumber, documentLine.LineNumber);
+                        if (oldHighlightedLine == null || !SectionsAreEqual(line.Sections, oldHighlightedLine.Sections))
+                        {
+                           HighlightingStateChanged?.Invoke(documentLine.LineNumber, documentLine.LineNumber);
+                        }
                     }, uiTaskScheduler).ConfigureAwait(false);
                 }, line.CancellationToken);
             }
             catch (OperationCanceledException) { }
+        }
+
+        private static bool SectionsAreEqual(IList<HighlightedSection> sections, IList<HighlightedSection> otherSections)
+        {
+           if (sections.Count != otherSections?.Count)
+              return false;
+        
+           for (int i = 0; i < sections.Count; i++)
+           {
+              var s1 = sections[i];
+              var s2 = otherSections[i];
+        
+              if (!s1.Color.Equals(s2.Color) || s1.Length != s2.Length || s1.Offset != s2.Offset)
+                 return false;
+           }
+        
+           return true;
         }
 
         private static bool IsOutsideLine(IDocumentLine documentLine, int offset, int length)
