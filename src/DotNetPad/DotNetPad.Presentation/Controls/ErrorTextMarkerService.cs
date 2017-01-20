@@ -37,9 +37,9 @@ namespace Waf.DotNetPad.Presentation.Controls
         public KnownLayer Layer => KnownLayer.Selection;
 
 
-        public void Create(int offset, int length, string message)
+        public void Create(int offset, int length, string message, Color color)
         {
-            var marker = new ErrorTextMarker(offset, length, message, Colors.Red);
+            var marker = new ErrorTextMarker(offset, length, message, color);
             markers.Add(marker);
             textEditor.TextArea.TextView.Redraw(marker);
         }

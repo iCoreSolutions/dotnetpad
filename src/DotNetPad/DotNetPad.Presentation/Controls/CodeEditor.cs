@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.CodeAnalysis;
 using Waf.DotNetPad.Applications.Services;
 using Waf.DotNetPad.Domain;
@@ -178,7 +179,8 @@ namespace Waf.DotNetPad.Presentation.Controls
             {
                 var startOffset = Document.GetOffset(new TextLocation(errorListItem.StartLine + 1, errorListItem.StartColumn + 1));
                 var endOffset = Document.GetOffset(new TextLocation(errorListItem.EndLine + 1, errorListItem.EndColumn + 1));
-                errorMarkerService.Create(startOffset, endOffset - startOffset, errorListItem.Description);
+                var color = errorListItem.ErrorSeverity == ErrorSeverity.Error ? Colors.Red : Colors.Green;
+                errorMarkerService.Create(startOffset, endOffset - startOffset, errorListItem.Description, color);
             }
         }
 
