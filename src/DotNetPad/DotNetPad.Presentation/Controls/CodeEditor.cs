@@ -179,7 +179,7 @@ namespace Waf.DotNetPad.Presentation.Controls
             {
                 var startOffset = Document.GetOffset(new TextLocation(errorListItem.StartLine + 1, errorListItem.StartColumn + 1));
                 var endOffset = Document.GetOffset(new TextLocation(errorListItem.EndLine + 1, errorListItem.EndColumn + 1));
-                var color = errorListItem.ErrorSeverity == ErrorSeverity.Error ? Colors.Red : Colors.Green;
+                var color = errorListItem.ErrorSeverity == ErrorSeverity.Error ? Colors.Red : Color.FromRgb(0, 128, 0);
                 errorMarkerService.Create(startOffset, endOffset - startOffset, errorListItem.Description, color);
             }
         }
