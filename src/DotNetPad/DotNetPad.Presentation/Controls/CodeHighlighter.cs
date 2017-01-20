@@ -61,7 +61,7 @@ namespace Waf.DotNetPad.Presentation.Controls
             cachedLines[lineNumber]?.Cancel();
             var newLine = new VersionedHighlightedLine(Document, documentLine, Document.Version, cachedLine);
             cachedLines[lineNumber] = newLine;
-            UpdateHighlightLineAsync(newLine, cachedLine);
+            UpdateHighlightLineAsync(newLine);
 
             foreach (var line in cachedLines.ToArray().Reverse())
             {
@@ -75,7 +75,7 @@ namespace Waf.DotNetPad.Presentation.Controls
             return newLine;
         }
 
-        private async void UpdateHighlightLineAsync(VersionedHighlightedLine line, VersionedHighlightedLine oldHighlightedLine)
+        private async void UpdateHighlightLineAsync(VersionedHighlightedLine line)
         {
             try
             {
@@ -100,23 +100,25 @@ namespace Waf.DotNetPad.Presentation.Controls
                             return;
                         }
 
-                        line.Sections.Clear();
+                        var newLineSections = new List<HighlightedSection>();
                         foreach (var classifiedSpan in spans)
                         {
                             if (IsOutsideLine(documentLine, classifiedSpan.TextSpan.Start, classifiedSpan.TextSpan.Length))
                             {
                                 continue;
                             }
-                            line.Sections.Add(new HighlightedSection
+                            newLineSections.Add(new HighlightedSection
                             {
                                 Color = CodeHighlightColors.GetHighlightingColor(classifiedSpan.ClassificationType),
                                 Offset = classifiedSpan.TextSpan.Start,
                                 Length = classifiedSpan.TextSpan.Length
                             });
                         }
-                        if (oldHighlightedLine == null || !SectionsAreEqual(line.Sections, oldHighlightedLine.Sections))
+                        if (!line.Sections.SequenceEqual(newLineSections, HighlightedSectionComparer.Default))
                         {
-                           HighlightingStateChanged?.Invoke(documentLine.LineNumber, documentLine.LineNumber);
+                            line.Sections.Clear();
+                            foreach (var newSection in newLineSections) { line.Sections.Add(newSection); }
+                            HighlightingStateChanged?.Invoke(documentLine.LineNumber, documentLine.LineNumber);
                         }
                     }, uiTaskScheduler).ConfigureAwait(false);
                 }, line.CancellationToken);
@@ -124,28 +126,11 @@ namespace Waf.DotNetPad.Presentation.Controls
             catch (OperationCanceledException) { }
         }
 
-        private static bool SectionsAreEqual(IList<HighlightedSection> sections, IList<HighlightedSection> otherSections)
-        {
-           if (sections.Count != otherSections?.Count)
-              return false;
-        
-           for (int i = 0; i < sections.Count; i++)
-           {
-              var s1 = sections[i];
-              var s2 = otherSections[i];
-        
-              if (!s1.Color.Equals(s2.Color) || s1.Length != s2.Length || s1.Offset != s2.Offset)
-                 return false;
-           }
-        
-           return true;
-        }
-
         private static bool IsOutsideLine(IDocumentLine documentLine, int offset, int length)
         {
             return offset < documentLine.Offset || offset + length > documentLine.EndOffset;
         }
-
+        
         private async Task<IEnumerable<ClassifiedSpan>> GetClassifiedSpansAsync(IDocumentLine documentLine, CancellationToken cancellationToken)
         {
             var document = getDocument();
@@ -230,6 +215,24 @@ namespace Waf.DotNetPad.Presentation.Controls
             public void Cancel()
             {
                 cancellationTokenSource.Cancel();
+            }
+        }
+
+        private sealed class HighlightedSectionComparer : IEqualityComparer<HighlightedSection>
+        {
+            public static HighlightedSectionComparer Default { get; } = new HighlightedSectionComparer();
+
+            public bool Equals(HighlightedSection x, HighlightedSection y)
+            {
+                if (x == y) { return true; }
+                if (x == null || y == null) { return false; }
+                return Equals(x.Color, y.Color) && x.Length == y.Length && x.Offset == y.Offset;
+            }
+
+            public int GetHashCode(HighlightedSection obj)
+            {
+                if (obj == null) { return 0; }
+                return (obj.Color?.GetHashCode() ?? 0) ^ obj.Length.GetHashCode() ^ obj.Offset.GetHashCode();
             }
         }
     }

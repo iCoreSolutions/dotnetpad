@@ -2,6 +2,21 @@ Changelog
 ---------
 
 
+Version 2.2.1.100 (Release)
+- Improve responsiveness of typing when the document has a lot of lines (Issue #6)
+- Update Microsoft.CodeAnalysis to 2.0.0 RC2
+
+
+Version 2.2.0.100 (Release)
+- Add System.ValueTuple package so that the new Tuple C#/VB feature works
+- Add code samples for the new C# 7 and VB 15 language features
+
+
+Version 2.1.0.100 (Release)
+- Update TargetFrameworkVersion to 4.6.1
+- Update Microsoft.CodeAnalysis to 2.0.0 RC (Support for C# 7.0 and VB 15.0)
+
+
 Version 2.0.2.100 (Release)
 - CodeHighlighter: Use faster approach; fix cleaning up the cache
 
