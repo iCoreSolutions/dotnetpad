@@ -6,8 +6,8 @@ namespace Waf.DotNetPad.Applications.Services
 {
     public interface IShellService : INotifyPropertyChanged
     {
-        AppSettings Settings { get; }
-        
+        AppSettings Settings { get; set; }
+         
         object ShellView { get; }
         
         IReadOnlyCollection<Task> TasksToCompleteBeforeShutdown { get; }

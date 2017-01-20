@@ -30,7 +30,7 @@ namespace Waf.DotNetPad.Applications.CodeAnalysis
             typeof(XDocument).Assembly,                             // System.Xml.Linq
             typeof(DataContractSerializer).Assembly,                // System.Runtime.Serialization
             typeof(ImmutableArray).Assembly,                        // System.Collections.Immutable
-            typeof(ValueTuple).Assembly                             // System.ValueTuple
+           //todo: not C#7 yet typeof(ValueTuple).Assembly          // System.ValueTuple
         };
 
         private readonly ConcurrentDictionary<string, DocumentationProvider> documentationProviders;

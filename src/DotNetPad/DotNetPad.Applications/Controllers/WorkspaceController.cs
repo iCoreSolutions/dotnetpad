@@ -21,7 +21,7 @@ using Waf.DotNetPad.Domain;
 
 namespace Waf.DotNetPad.Applications.Controllers
 {
-    [Export, Export(typeof(IWorkspaceService))]
+    //[Export, Export(typeof(IWorkspaceService))]
     internal class WorkspaceController : IWorkspaceService
     {
         private readonly TaskScheduler taskScheduler;
