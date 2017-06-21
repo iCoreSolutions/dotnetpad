@@ -8,7 +8,7 @@ using Waf.DotNetPad.Applications.Services;
 
 namespace Waf.DotNetPad.Presentation.Services
 {
-    [Export(typeof(IEnvironmentService))]
+    //[Export(typeof(IEnvironmentService))]
     public class EnvironmentService : IEnvironmentService
     {
         private readonly Lazy<string> profilePath;
