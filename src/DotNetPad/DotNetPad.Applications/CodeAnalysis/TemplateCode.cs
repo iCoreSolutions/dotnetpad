@@ -2,13 +2,11 @@
 {
     internal static class TemplateCode
     {
-        public static string InitialCSharpCode
-        {
-            get
-            {
-                return
-                    @"using System;
+        public static string InitialCSharpCode =>     
+@"using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sample
 {
@@ -20,18 +18,14 @@ namespace Sample
         }
     }
 }";
-            }
-        }
 
-        public static int StartCaretPositionCSharp { get { return 160; } }
+        public static int StartCaretPositionCSharp => 226;
 
-        public static string InitialVisualBasicCode
-        {
-            get
-            {
-                return
-                    @"Imports System
+        public static string InitialVisualBasicCode =>
+@"Imports System
+Imports System.Collections.Generic
 Imports System.Linq
+Imports System.Threading.Tasks
 
 Namespace Sample
     Module Program
@@ -40,9 +34,7 @@ Namespace Sample
         End Sub
     End Module
 End Namespace";
-            }
-        }
 
-        public static int StartCaretPositionVisualBasic { get { return 110; } }
+        public static int StartCaretPositionVisualBasic => 177;
     }
 }

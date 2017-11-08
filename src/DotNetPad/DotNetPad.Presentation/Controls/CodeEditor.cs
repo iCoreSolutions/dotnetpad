@@ -16,6 +16,7 @@ using System.Windows.Media;
 using Microsoft.CodeAnalysis;
 using Waf.DotNetPad.Applications.Services;
 using Waf.DotNetPad.Domain;
+using System.Waf;
 
 namespace Waf.DotNetPad.Presentation.Controls
 {
@@ -40,7 +41,10 @@ namespace Waf.DotNetPad.Presentation.Controls
             SearchPanel.Install(TextArea);
             completionCancellation = new CancellationTokenSource();
 
-            TextArea.TextView.LineTransformers.Insert(0, new CodeHighlightingColorizer(() => workspaceService.GetDocument(documentFile)));
+            if (!WafConfiguration.IsInDesignMode)
+            {
+                TextArea.TextView.LineTransformers.Insert(0, new CodeHighlightingColorizer(() => workspaceService.GetDocument(documentFile)));
+            }
             TextArea.TextEntering += TextAreaTextEntering;
             TextArea.TextEntered += TextAreaTextEntered;
 
@@ -186,7 +190,11 @@ namespace Waf.DotNetPad.Presentation.Controls
 
         private void DocumentContentPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DocumentContent.ErrorList))
+            if (e.PropertyName == nameof(DocumentContent.Code))
+            {
+                UpdateCode();
+            }
+            else if (e.PropertyName == nameof(DocumentContent.ErrorList))
             {
                 UpdateErrorMarkers();
             }
@@ -195,6 +203,17 @@ namespace Waf.DotNetPad.Presentation.Controls
         private void IsVisibleChangedHandler(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (!IsVisible) { completionCancellation.Cancel(); }
+        }
+
+        private bool UpdateCode()
+        {
+            var code = DocumentFile.Content.Code;
+            if (Text != code)
+            {
+                Text = code;
+                return true;
+            }
+            return false;
         }
 
         private static void WorkspaceServiceChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -215,13 +234,10 @@ namespace Waf.DotNetPad.Presentation.Controls
 
             if (editor.DocumentFile?.Content != null)
             {
-                var code = editor.DocumentFile.Content.Code;
-                if (editor.Text != code)
+                if (editor.UpdateCode())
                 {
-                    editor.Text = code;
                     editor.CaretOffset = editor.DocumentFile.StartCaretPosition;
                 }
-
                 PropertyChangedEventManager.AddHandler(editor.DocumentFile.Content, editor.DocumentContentPropertyChanged, "");
                 editor.UpdateErrorMarkers();
             }

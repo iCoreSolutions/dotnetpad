@@ -1,6 +1,8 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualBasic;
 using System;
@@ -30,7 +32,7 @@ namespace Waf.DotNetPad.Applications.CodeAnalysis
             typeof(XDocument).Assembly,                             // System.Xml.Linq
             typeof(DataContractSerializer).Assembly,                // System.Runtime.Serialization
             typeof(ImmutableArray).Assembly,                        // System.Collections.Immutable
-           //todo: not C#7 yet typeof(ValueTuple).Assembly          // System.ValueTuple
+            Type.GetType("System.ValueTuple", throwOnError: false)?.Assembly ?? typeof(ValueTuple).Assembly     // System.ValueTuple
         };
 
         private readonly ConcurrentDictionary<string, DocumentationProvider> documentationProviders;
@@ -42,6 +44,12 @@ namespace Waf.DotNetPad.Applications.CodeAnalysis
         }
 
 
+        public override bool CanApplyChange(ApplyChangesKind feature)
+        {
+            return feature == ApplyChangesKind.ChangeDocument || base.CanApplyChange(feature);
+        }
+
+
         public DocumentId AddProjectWithDocument(string documentFileName, string text)
         {
             var fileName = Path.GetFileName(documentFileName);
@@ -49,13 +57,16 @@ namespace Waf.DotNetPad.Applications.CodeAnalysis
             var language = Path.GetExtension(documentFileName) == ".vb" ? LanguageNames.VisualBasic : LanguageNames.CSharp;
 
             var projectId = ProjectId.CreateNewId();
-            
-            var references = defaultReferences.Select(CreateReference).ToList();
+
+            // ValueTuple needs a separate assembly in .NET 4.6.x. But it is not needed anymore in .NET 4.7+ as it is included in mscorelib.
+            var references = defaultReferences.Distinct().Select(CreateReference).ToList();
             references.Add(CreateReference(Assembly.Load("System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")));
             if (language == LanguageNames.VisualBasic) { references.Add(CreateReference(typeof(VBMath).Assembly)); }
             else if (language == LanguageNames.CSharp) { references.Add(CreateReference(typeof(RuntimeBinderException).Assembly)); }
 
-            var projectInfo = ProjectInfo.Create(projectId, VersionStamp.Default, name, name + ".dll", language, metadataReferences: references);
+            var projectInfo = ProjectInfo.Create(projectId, VersionStamp.Default, name, name + ".dll", language, metadataReferences: references,
+                parseOptions: language == LanguageNames.CSharp ? (ParseOptions)new CSharpParseOptions(languageVersion: Microsoft.CodeAnalysis.CSharp.LanguageVersion.Latest) 
+                    : new VisualBasicParseOptions(Microsoft.CodeAnalysis.VisualBasic.LanguageVersion.Latest));
             OnProjectAdded(projectInfo);
 
             var documentId = DocumentId.CreateNewId(projectId);
@@ -103,6 +114,21 @@ namespace Waf.DotNetPad.Applications.CodeAnalysis
             }, cancellationToken);
         }
         
+        public Task FormatDocumentAsync(DocumentId documentId)
+        {
+            return Task.Run(async () =>
+            {
+                var formattedDocument = await Microsoft.CodeAnalysis.Formatting.Formatter.FormatAsync(
+                        CurrentSolution.GetDocument(documentId)).ConfigureAwait(false);
+                TryApplyChanges(formattedDocument.Project.Solution);
+            });
+        }
+
+        protected override void ApplyDocumentTextChanged(DocumentId documentId, SourceText text)
+        {
+            OnDocumentTextChanged(documentId, text, PreservationMode.PreserveValue);
+        }
+
         private MetadataReference CreateReference(Assembly assembly)
         {
             string assemblyPath = assembly.Location;

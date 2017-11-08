@@ -21,6 +21,7 @@ namespace Waf.DotNetPad.Applications.ViewModels
         private object outputView;
         private ICommand startCommand;
         private ICommand stopCommand;
+        private ICommand formatDocumentCommand;
         private bool isScriptRunning;
         private ICommand infoCommand;
         private object currentStatusView;
@@ -34,13 +35,13 @@ namespace Waf.DotNetPad.Applications.ViewModels
             IVisualBasicSampleService visualBasicSampleService)
             : base(view)
         {
-            this.ShellService = shellService;
-            this.FileService = fileService;
-            this.CSharpSampleService = csharpSampleService;
-            this.VisualBasicSampleService = visualBasicSampleService;
-            this.settings = shellService.Settings;
-            this.garbageCollectorCommand = new DelegateCommand(GC.Collect);
-            this.statusText = Resources.Ready;
+            ShellService = shellService;
+            FileService = fileService;
+            CSharpSampleService = csharpSampleService;
+            VisualBasicSampleService = visualBasicSampleService;
+            settings = shellService.Settings;
+            garbageCollectorCommand = new DelegateCommand(GC.Collect);
+            statusText = Resources.Ready;
             
             PropertyChangedEventManager.AddHandler(fileService, FileServicePropertyChanged, "");
             view.Closed += ViewClosed;
@@ -94,6 +95,12 @@ namespace Waf.DotNetPad.Applications.ViewModels
             set { SetProperty(ref stopCommand, value); }
         }
 
+        public ICommand FormatDocumentCommand
+        {
+            get { return formatDocumentCommand; }
+            set { SetProperty(ref formatDocumentCommand, value); }
+        }
+        
         public bool IsScriptRunning
         {
             get { return isScriptRunning; }

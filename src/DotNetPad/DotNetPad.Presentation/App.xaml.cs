@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime;
 using System.Waf;
 using System.Waf.Applications;
+using System.Waf.Presentation;
 using System.Windows;
 using System.Windows.Threading;
 using Waf.DotNetPad.Applications.Services;
@@ -18,7 +19,7 @@ using Waf.DotNetPad.Presentation.Services;
 
 namespace Waf.DotNetPad.Presentation
 {
-    public partial class App : Application
+    public partial class App
     {
         private AggregateCatalog catalog;
         private CompositionContainer container;
