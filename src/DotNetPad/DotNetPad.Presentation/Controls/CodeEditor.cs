@@ -16,6 +16,7 @@ using System.Windows.Media;
 using Microsoft.CodeAnalysis;
 using Waf.DotNetPad.Applications.Services;
 using Waf.DotNetPad.Domain;
+using System.Waf;
 
 namespace Waf.DotNetPad.Presentation.Controls
 {
@@ -40,7 +41,10 @@ namespace Waf.DotNetPad.Presentation.Controls
             SearchPanel.Install(TextArea);
             completionCancellation = new CancellationTokenSource();
 
-            TextArea.TextView.LineTransformers.Insert(0, new CodeHighlightingColorizer(() => workspaceService.GetDocument(documentFile)));
+            if (!WafConfiguration.IsInDesignMode)
+            {
+                TextArea.TextView.LineTransformers.Insert(0, new CodeHighlightingColorizer(() => workspaceService.GetDocument(documentFile)));
+            }
             TextArea.TextEntering += TextAreaTextEntering;
             TextArea.TextEntered += TextAreaTextEntered;
 
